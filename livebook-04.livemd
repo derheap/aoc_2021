@@ -1,0 +1,38 @@
+# AOC-Day 04
+
+## Section
+
+```elixir
+Mix.install([
+  {:kino, "~> 0.4.0"}
+])
+```
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file:")
+```
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+lines =
+  input
+  |> Kino.Input.read()
+  |> String.split("\n")
+```
+
+```elixir
+[numbers_raw | [_ | boards_raw]] = lines
+
+numbers =
+  numbers_raw
+  |> String.split(",")
+  |> Enum.map(&String.to_integer/1)
+
+boards =
+  boards_raw
+  |> Enum.chunk_every(6)
+  |> Enum.map(fn x -> Enum.filter(x, &(String.length(&1) > 0)) end)
+  |> Enum.map(fn x -> Enum.map(x, &String.split(&1, " ", trim: true)) end)
+  |> Enum.map(fn x -> Enum.map(x, fn e -> Enum.map(e, &String.to_integer(&1)) end) end)
+```
