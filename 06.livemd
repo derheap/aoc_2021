@@ -1,0 +1,33 @@
+# AOC-Day 04
+
+## Section
+
+```elixir
+Mix.install([
+  {:kino, "~> 0.4.0"}
+])
+
+import ExUnit.Assertions
+```
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file:")
+```
+
+```elixir
+defmodule Fish do
+  def tick(0), do: {6, true}
+  def tick(timer), do: {timer - 1, false}
+end
+
+assert Fish.tick(1) == {0, false}
+assert Fish.tick(8) == {7, false}
+assert Fish.tick(0) == {6, true}
+```
+
+```elixir
+fishes =
+  input
+  |> Kino.Input.read()
+  |> String.split(",", trim: true)
+```
