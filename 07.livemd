@@ -1,0 +1,69 @@
+# AOC-Day 7
+
+## Part 1
+
+```elixir
+Mix.install([
+  {:kino, "~> 0.4.0"}
+])
+
+import ExUnit.Assertions
+```
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file:")
+```
+
+```elixir
+test_input = "16,1,2,0,4,2,7,1,2,14"
+```
+
+```elixir
+defmodule Whales do
+  def median(positions) do
+    Enum.at(Enum.sort(positions), Kernel.trunc(Enum.count(positions) / 2))
+  end
+
+  def cost_for_position(positions, target) do
+    positions
+    |> Enum.map(&Kernel.abs(&1 - target))
+    |> Enum.sum()
+  end
+end
+
+whales =
+  input
+  |> Kino.Input.read()
+  |> String.split(",", trim: true)
+  |> Enum.map(&String.to_integer/1)
+
+Whales.cost_for_position(whales, Whales.median(whales))
+```
+
+## Part 2
+
+```elixir
+defmodule Whales2 do
+  def cost_per_move(dist) do
+    Kernel.trunc(dist * (dist + 1) / 2)
+  end
+
+  def cost_for_position(positions, target) do
+    positions
+    |> Enum.map(&cost_per_move(Kernel.abs(&1 - target)))
+    |> Enum.sum()
+  end
+
+  def calc_costs(whales) do
+    for index <- whales, do: Whales2.cost_for_position(whales, index)
+  end
+end
+
+whales =
+  input
+  |> Kino.Input.read()
+  |> String.split(",", trim: true)
+  |> Enum.map(&String.to_integer/1)
+  |> Whales2.calc_costs()
+  |> Enum.min()
+```
