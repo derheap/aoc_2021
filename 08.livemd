@@ -49,6 +49,17 @@ part1 =
 
 ```elixir
 defmodule Display do
+
+  segments = %{
+    :a => [1,0,1,1,0,1,1,1,1,1],
+    :b => [1,0,0,0,1,1,1,0,1,1],
+    :c => [1,1,1,1,1,0,0,1,1,1],
+    :d => [0,0,1,1,1,1,1,0,1,1],
+    :e => [1,0,1,0,0,0,1,0,1,0]
+    :f => [1,1,0,1,1,1,1,1,1,1],
+    :g => [1,0,1,1,0,1,1,0,1,1]
+  }
+
   def sort_string(s) do
     s
     |> String.split("")
@@ -61,7 +72,7 @@ defmodule Display do
   end
 end
 
-part2 =
+part1 =
   display
   |> Enum.map(fn %{digits: d, wiring: w} ->
     %{wiring: Display.sort(w), digits: Display.sort(d)}
