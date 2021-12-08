@@ -1,0 +1,80 @@
+# AOC-Day 07
+
+## Part 1
+
+```elixir
+Mix.install([
+  {:kino, "~> 0.4.0"}
+])
+
+import ExUnit.Assertions
+```
+
+```elixir
+input = Kino.Input.textarea("Please paste your input file:")
+```
+
+```elixir
+display =
+  input
+  |> Kino.Input.read()
+  |> String.split("\n", trim: true)
+  |> Enum.map(fn x -> String.split(x, ~r"(\s*\|\s*)") end)
+  |> Enum.map(fn [wiring | [digits]] ->
+    %{wiring: String.split(wiring, " "), digits: String.split(digits, " ")}
+  end)
+```
+
+```elixir
+# look for 2,4,3,7 segments
+part1 =
+  display
+  |> Enum.map(fn %{digits: digits} -> digits end)
+  |> Enum.map(fn list ->
+    Enum.filter(list, fn s ->
+      case String.length(s) do
+        2 -> true
+        4 -> true
+        3 -> true
+        7 -> true
+        _ -> false
+      end
+    end)
+  end)
+  |> Enum.concat()
+  |> Enum.count()
+```
+
+## Part 2
+
+```elixir
+defmodule Display do
+
+  segments = %{
+    :a => [1,0,1,1,0,1,1,1,1,1],
+    :b => [1,0,0,0,1,1,1,0,1,1],
+    :c => [1,1,1,1,1,0,0,1,1,1],
+    :d => [0,0,1,1,1,1,1,0,1,1],
+    :e => [1,0,1,0,0,0,1,0,1,0]
+    :f => [1,1,0,1,1,1,1,1,1,1],
+    :g => [1,0,1,1,0,1,1,0,1,1]
+  }
+
+  def sort_string(s) do
+    s
+    |> String.split("")
+    |> Enum.sort()
+    |> Enum.join("")
+  end
+
+  def sort(list) do
+    Enum.map(list, &sort_string(&1))
+  end
+end
+
+part1 =
+  display
+  |> Enum.map(fn %{digits: d, wiring: w} ->
+    %{wiring: Display.sort(w), digits: Display.sort(d)}
+  end)
+```
