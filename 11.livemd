@@ -1,0 +1,55 @@
+# Day 11: Dumbo Octopus
+
+## Part 1
+
+```elixir
+test_input = """
+5483143223
+2745854711
+5264556173
+6141336146
+6357385478
+4167524645
+2176841721
+6882881134
+4846848554
+5283751526
+"""
+```
+
+```elixir
+defmodule Board do
+  defstruct board: {}, size: 10
+
+  def init_from_list(lists) do
+    b = List.to_tuple(for row <- lists, do: List.to_tuple(row))
+    %Board{board: b}
+  end
+
+  def get(b, x, y) do
+    elem(elem(b.board, y), x)
+  end
+
+  def increment_row(row, max, idx) when idx < max - 1 do
+    increment_row(put_elem(row, idx, elem(row, idx) + 1), max, idx + 1)
+  end
+
+  def increment_row(row, max, idx) do
+    row
+  end
+
+  def increment_energy(b) do
+    %Board{board: increment_row(elem(b.board, 0), b.size, 0)}
+  end
+end
+```
+
+```elixir
+board =
+  test_input
+  |> String.split("\n", trim: true)
+  |> Enum.map(&String.to_charlist(&1))
+  |> Enum.map(fn row -> Enum.map(row, &(&1 - ?0)) end)
+  |> Board.init_from_list()
+  |> Board.increment_energy()
+```
