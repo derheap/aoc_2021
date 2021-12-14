@@ -1,0 +1,44 @@
+# Day 14: Extended Polymerization
+
+## Part 1
+
+```elixir
+test_input = """
+NNCB
+
+CH -> B
+HH -> N
+CB -> H
+NH -> C
+HB -> C
+HC -> B
+HN -> C
+NN -> C
+BH -> H
+NC -> B
+NB -> B
+BN -> B
+BB -> N
+BC -> B
+CC -> N
+CN -> C
+"""
+```
+
+```elixir
+[template | rules_raw] = String.split(test_input, "\n", trim: true)
+
+rules =
+  rules_raw
+  |> Enum.map(fn line ->
+    [pair, insertion] = String.split(line, " -> ")
+    %{String.to_charlist(pair) => String.to_charlist(insertion)}
+  end)
+```
+
+```elixir
+template
+|> String.to_charlist()
+|> Enum.chunk_every(2,1)
+|> Enum.map(fn)
+```
