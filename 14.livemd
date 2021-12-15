@@ -26,19 +26,161 @@ CN -> C
 ```
 
 ```elixir
-[template | rules_raw] = String.split(test_input, "\n", trim: true)
+input = """
+CKKOHNSBPCPCHVNKHFFK
+
+KO -> C
+SO -> S
+BF -> V
+VN -> B
+OV -> K
+VH -> O
+KV -> N
+KB -> F
+NB -> C
+HS -> K
+PF -> B
+HB -> N
+OC -> H
+FS -> F
+VV -> S
+KF -> C
+FN -> F
+KP -> S
+HO -> N
+NH -> K
+OO -> S
+FB -> C
+BP -> F
+CH -> N
+SN -> O
+KN -> B
+CV -> O
+CC -> B
+VB -> C
+PH -> V
+CO -> K
+KS -> K
+BK -> N
+FH -> S
+PV -> H
+CB -> P
+FO -> F
+BB -> K
+OB -> C
+HH -> F
+ON -> O
+FK -> B
+NF -> F
+SV -> F
+CP -> H
+SS -> B
+OP -> H
+NS -> O
+HK -> N
+BC -> P
+NV -> V
+VS -> F
+PC -> V
+CS -> F
+NP -> V
+PS -> F
+VC -> F
+KK -> S
+PO -> P
+HF -> H
+KC -> P
+SF -> N
+BV -> N
+FF -> V
+FV -> V
+BO -> N
+OS -> C
+OF -> H
+CN -> S
+NO -> O
+NC -> B
+VK -> C
+HN -> B
+PK -> N
+SK -> S
+HV -> F
+BH -> B
+OK -> S
+VO -> B
+BS -> H
+PP -> N
+SC -> K
+BN -> P
+FC -> S
+SB -> B
+SH -> H
+NN -> V
+NK -> N
+VF -> H
+CF -> F
+PB -> C
+SP -> P
+KH -> C
+VP -> N
+CK -> H
+HP -> P
+FP -> B
+HC -> O
+PN -> F
+OH -> H
+"""
+```
+
+```elixir
+[template | rules_raw] = String.split(input, "\n", trim: true)
 
 rules =
   rules_raw
-  |> Enum.map(fn line ->
+  |> Enum.reduce(%{}, fn line, map ->
     [pair, insertion] = String.split(line, " -> ")
-    %{String.to_charlist(pair) => String.to_charlist(insertion)}
+    Map.put(map, String.to_charlist(pair), String.to_charlist(String.at(pair, 0) <> insertion))
   end)
 ```
 
 ```elixir
+defmodule Loop do
+  def recur(template, rules, 0) do
+    template
+  end
+
+  def recur(template, rules, count) do
+    template
+    |> Enum.chunk_every(2, 1)
+    |> Enum.map(fn pair ->
+      case Map.fetch(rules, pair) do
+        {:ok, insert} -> insert
+        _ -> [hd(pair)]
+      end
+    end)
+    |> Enum.flat_map(& &1)
+    |> recur(rules, count - 1)
+  end
+end
+
 template
 |> String.to_charlist()
-|> Enum.chunk_every(2,1)
-|> Enum.map(fn)
+|> Loop.recur(rules, 10)
+|> Enum.frequencies()
+|> Map.values()
+|> Enum.sort()
+|> then(fn list -> Enum.at(list, Enum.count(list) - 1) - Enum.at(list, 0) end)
+```
+
+## Part 2
+
+```elixir
+template
+|> String.to_charlist()
+|> Loop.recur(rules, 15)
+
+# |> Enum.frequencies()
+# |> Map.values()
+# |> Enum.sort()
+# |> then(fn list -> Enum.at(list,Enum.count(list) - 1) - Enum.at(list, 0) end)
 ```
