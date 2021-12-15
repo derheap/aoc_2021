@@ -175,7 +175,7 @@ template
 ## Part 2
 
 ```elixir
-[template | rules_raw] = String.split(test_input, "\n", trim: true)
+[template | rules_raw] = String.split(input, "\n", trim: true)
 
 rules =
   rules_raw
@@ -188,7 +188,7 @@ pairs =
   template
   |> String.to_charlist()
   |> Enum.chunk_every(2, 1)
-  |> Enum.reduce(%{}, fn pair, map -> Map.put(map, pair, 1) end)
+  |> Enum.reduce(%{}, fn pair, map -> Map.update(map, pair, 1, &(&1 + 1)) end)
 ```
 
 ```elixir
@@ -202,9 +202,15 @@ defmodule Polymere do
       Enum.reduce(pairs, %{}, fn pair, map ->
         key = elem(pair, 0)
         count = elem(pair, 1)
-        {pair_one, pair_two} = Map.fetch(rules, key)
-        step_one = Map.update(map, pair_one, count, fn x -> x + count end)
-        Map.update(step_one, pair_two, count, fn x -> x + count end)
+
+        case Map.fetch(rules, key) do
+          {:ok, {pair_one, pair_two}} ->
+            step_one = Map.update(map, pair_one, count, fn x -> x + count end)
+            Map.update(step_one, pair_two, count, fn x -> x + count end)
+
+          :error ->
+            Map.update(map, key, 1, fn x -> x end)
+        end
       end)
 
     recur(new_pairs, rules, count_down - 1)
@@ -213,9 +219,9 @@ end
 
 count =
   pairs
-  |> Polymere.recur(rules, 10)
+  |> Polymere.recur(rules, 40)
   |> Map.to_list()
-  |> Enum.reduce(%{}, fn {[first, _], count}, map ->
+  |> Enum.reduce(%{}, fn {[first | _], count}, map ->
     Map.update(map, <<first>>, count, &(&1 + count))
   end)
   |> Map.values()
