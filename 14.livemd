@@ -133,7 +133,7 @@ OH -> H
 ```
 
 ```elixir
-[template | rules_raw] = String.split(input, "\n", trim: true)
+[template | rules_raw] = String.split(test_input, "\n", trim: true)
 
 rules =
   rules_raw
@@ -175,12 +175,50 @@ template
 ## Part 2
 
 ```elixir
-template
-|> String.to_charlist()
-|> Loop.recur(rules, 15)
+[template | rules_raw] = String.split(test_input, "\n", trim: true)
 
-# |> Enum.frequencies()
-# |> Map.values()
-# |> Enum.sort()
-# |> then(fn list -> Enum.at(list,Enum.count(list) - 1) - Enum.at(list, 0) end)
+rules =
+  rules_raw
+  |> Enum.reduce(%{}, fn line, map ->
+    [[pre, post], [insertion]] = Enum.map(String.split(line, " -> "), &String.to_charlist/1)
+    Map.put(map, [pre, post], {[pre, insertion], [insertion, post]})
+  end)
+
+pairs =
+  template
+  |> String.to_charlist()
+  |> Enum.chunk_every(2, 1)
+  |> Enum.reduce(%{}, fn pair, map -> Map.put(map, pair, 1) end)
+```
+
+```elixir
+defmodule Polymere do
+  def recur(pairs, rules, 0) do
+    pairs
+  end
+
+  def recur(pairs, rules, count_down) do
+    new_pairs =
+      Enum.reduce(pairs, %{}, fn pair, map ->
+        key = elem(pair, 0)
+        count = elem(pair, 1)
+        {pair_one, pair_two} = Map.fetch(rules, key)
+        step_one = Map.update(map, pair_one, count, fn x -> x + count end)
+        Map.update(step_one, pair_two, count, fn x -> x + count end)
+      end)
+
+    recur(new_pairs, rules, count_down - 1)
+  end
+end
+
+count =
+  pairs
+  |> Polymere.recur(rules, 10)
+  |> Map.to_list()
+  |> Enum.reduce(%{}, fn {[first, _], count}, map ->
+    Map.update(map, <<first>>, count, &(&1 + count))
+  end)
+  |> Map.values()
+  |> Enum.sort()
+  |> then(fn list -> Enum.at(list, Enum.count(list) - 1) - Enum.at(list, 0) end)
 ```
